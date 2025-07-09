@@ -20,6 +20,7 @@ __pycache__/
 *.db
 *.sqlite
 *.sqlite3
+ticket_booking.db
 
 # IDE and editor files
 .vscode/
