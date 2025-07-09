@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Task Manager - All Tasks{% endblock %}
+
+{% block content %}
+<h1>📝 Task Manager</h1>
+
+<!-- Task Creation Form -->
+<div class="form-container">
+    <h2 style="margin-bottom: 20px; color: #555;">➕ Add New Task</h2>
+    <form id="taskForm" action="/ui/tasks" method="post">
+        <div class="form-group">
+            <label for="title">Task Title *</label>
+            <input type="text" id="title" name="title" required maxlength="200" 
+                   placeholder="Enter task title...">
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" maxlength="1000" 
+                      placeholder="Enter task description (optional)..."></textarea>
+        </div>
+        
+        <button type="submit" class="btn">Create Task</button>
+    </form>
+</div>
+
+<!-- Task List -->
+<div class="task-list">
+    <h2 style="margin-bottom: 20px; color: #555;">📋 Your Tasks ({{ tasks|length }})</h2>
+    
+    {% if tasks %}
+        {% for task in tasks %}
+        <div class="task-item {% if task.completed %}completed{% endif %}">
+            <div class="task-title">
+                {% if task.completed %}✅{% else %}⏳{% endif %} {{ task.title }}
+            </div>
+            
+            {% if task.description %}
+            <div class="task-description">
+                {{ task.description }}
+            </div>
+            {% endif %}
+            
+            <div class="task-actions">
+                {% if not task.completed %}
+                    <form style="display: inline;" action="/ui/tasks/{{ task.id }}/complete" method="post">
+                        <button type="submit" class="btn btn-small btn-success">
+                            ✓ Mark Complete
+                        </button>
+                    </form>
+                {% else %}
+                    <form style="display: inline;" action="/ui/tasks/{{ task.id }}/incomplete" method="post">
+                        <button type="submit" class="btn btn-small btn-warning">
+                            ↻ Mark Incomplete
+                        </button>
+                    </form>
+                {% endif %}
+                
+                <button onclick="editTask({{ task.id }}, '{{ task.title }}', '{{ task.description or '' }}')" 
+                        class="btn btn-small btn-warning">
+                    ✏️ Edit
+                </button>
+                
+                <form style="display: inline;" action="/ui/tasks/{{ task.id }}/delete" method="post" 
+                      onsubmit="return confirm('Are you sure you want to delete this task?')">
+                    <button type="submit" class="btn btn-small btn-danger">
+                        🗑️ Delete
+                    </button>
+                </form>
+            </div>
+            
+            <div class="task-meta">
+                Created: {{ task.created_at.strftime('%Y-%m-%d %H:%M') }} | 
+                Updated: {{ task.updated_at.strftime('%Y-%m-%d %H:%M') }}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-tasks">
+            <h3>🎯 No tasks yet!</h3>
+            <p>Create your first task using the form above.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Edit Task Modal (Simple JavaScript) -->
+<div id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+     background: rgba(0,0,0,0.5); z-index: 1000; backdrop-filter: blur(5px);">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+         background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 500px;
+         box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+        <h3 style="margin-bottom: 20px; color: #555;">✏️ Edit Task</h3>
+        <form id="editForm" method="post">
+            <div class="form-group">
+                <label for="editTitle">Task Title *</label>
+                <input type="text" id="editTitle" name="title" required maxlength="200">
+            </div>
+            
+            <div class="form-group">
+                <label for="editDescription">Description</label>
+                <textarea id="editDescription" name="description" maxlength="1000"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" onclick="closeEditModal()" class="btn" 
+                        style="background: #6c757d;">Cancel</button>
+                <button type="submit" class="btn">Update Task</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function editTask(taskId, title, description) {
+    document.getElementById('editTitle').value = title;
+    document.getElementById('editDescription').value = description || '';
+    document.getElementById('editForm').action = `/ui/tasks/${taskId}/edit`;
+    document.getElementById('editModal').style.display = 'block';
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+document.getElementById('editModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeEditModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeEditModal();
+    }
+});
+
+// Form validation and enhancement
+document.getElementById('taskForm').addEventListener('submit', function(e) {
+    const title = document.getElementById('title').value.trim();
+    if (!title) {
+        e.preventDefault();
+        alert('Please enter a task title');
+        return;
+    }
+});
+
+// Auto-resize textarea
+document.querySelectorAll('textarea').forEach(textarea => {
+    textarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Task Manager{% endblock %}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-container {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: scale(1.02);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(1.02);
+        }
+
+        .task-list {
+            margin-top: 30px;
+        }
+
+        .task-item {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-item.completed {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-color: #c3e6cb;
+        }
+
+        .task-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .task-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 14px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 3px 6px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            box-shadow: 0 3px 6px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+            box-shadow: 0 3px 6px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-success:hover, .btn-warning:hover, .btn-danger:hover {
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        .task-meta {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .no-tasks {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .task-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        // Add smooth animations and interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add loading states to buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    if (this.type === 'submit') {
+                        this.style.opacity = '0.7';
+                        this.innerHTML = 'Processing...';
+                    }
+                });
+            });
+
+            // Add hover effects to task items
+            const taskItems = document.querySelectorAll('.task-item');
+            taskItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px) scale(1.02)';
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
