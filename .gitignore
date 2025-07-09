@@ -2,6 +2,9 @@
 learning-examples/
 learning_examples/
 
+# Documentation folders (local only)
+Ticket Booking System with Database Relationships/docs/
+
 # Virtual environments
 venv/
 env/
