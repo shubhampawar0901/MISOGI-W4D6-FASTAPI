@@ -1,3 +1,7 @@
+# Learning examples and tutorial files
+learning-examples/
+learning_examples/
+
 # Virtual environments
 venv/
 env/
